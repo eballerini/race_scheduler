@@ -41,7 +41,7 @@ def read_file(filename):
 
 
 def format_date(d):
-    print(datetime.strftime(d, "%a %B %d, %Y"))
+    return datetime.strftime(d, "%a %B %d, %Y")
 
 
 def print_usage_and_exit():
@@ -69,7 +69,7 @@ def main():
     today = datetime.today().date()
     for w in reversed(weeks):
         for d in reversed(w.days):
-            if d != "Rest":
+            if d.lower() != "rest":
                 if is_time_based:
                     w.training_days.insert(0, (d, current_date))
                 else:
@@ -95,9 +95,9 @@ def main():
                     found_today = True
 
             if is_time_based:
-                print(datetime.strftime(day, "%a, %B %d, %Y") + ": " + activity + here)
+                print(format_date(day) + ": " + activity + here)
             else:
-                print(datetime.strftime(day, "%a, %B %d, %Y") + ": " + "{:2.1f}".format(activity) + " km" + here)
+                print(format_date(day) + ": " + "{:2.1f}".format(activity) + " km" + here)
 
 
 if __name__ == "__main__":
