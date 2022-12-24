@@ -1,15 +1,11 @@
 from datetime import datetime, timedelta
 import sys
 
-# MILE_TO_KM = 1.609
-
 
 class Week:
     def __init__(self, week_num, days):
         self.week_num = week_num
-        print(f"original days: {days}")
-        self.days = days[1:]  # days[0] = Monday # TODO get rid of the total column in the km sheet
-        print(f"after: {self.days}")
+        self.days = days[1:]  # don't keep the week
         self.training_days = []
 
     def __str__(self):
@@ -21,10 +17,15 @@ def read_file(filename):
     weeks = []
     with open(filename) as file_in:
         header = file_in.readline()
-        print(f"header: {header}")
-        # if header != "Week,Mon,Tues,Wed,Thur,Fri,Sat,Sun,Total":
-        #     print("header expected to be: Week,Mon,Tues,Wed,Thur,Fri,Sat,Sun,Total")
-        #     sys.exit()
+        expected_header_fields = ["Week", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"]
+        actual_header_fields = header.split(",")
+
+        # removes the pesky carriage return at the end of the line
+        actual_header_fields[-1] = actual_header_fields[-1].strip()
+        if actual_header_fields != expected_header_fields:
+            print(f"actual_header_fields: {actual_header_fields}")
+            print(f"Error: header fields expected to be: {','.join(expected_header_fields)}")
+            print_usage_and_exit()
 
         week_num = 1
         for raw_line in file_in:
@@ -44,12 +45,12 @@ def format_date(d):
 
 
 def print_usage_and_exit():
-    print("usage: python marathon_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time>")
+    print("usage: python race_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time>")
     sys.exit()
 
 
 def main():
-    print(f"Welcome to the marathon scheduler!")
+    print(f"Welcome to the race scheduler!")
     if len(sys.argv) != 4:
         print("Not enough arguments")
         print_usage_and_exit()
@@ -62,17 +63,11 @@ def main():
 
     is_time_based = unit == "time"
 
-    print(f"filename: {filename}")
     weeks = read_file(filename)
     race_day = datetime.strptime(race_date_raw, "%Y-%m-%d")
-    print(f"race_date: {race_date_raw}")
-    print(f"race day: {race_day}")
     current_date = race_day
     today = datetime.today()
     for w in reversed(weeks):
-        print(w)
-        print(f"week_num: {w.week_num}, num days = {len(w.days)}")
-        # print(f"week_num: {w.week_num}, mon = {w.days[0]}, sun = {w.days[6]}")
         for d in reversed(w.days):
             if d != "Rest":
                 if is_time_based:
