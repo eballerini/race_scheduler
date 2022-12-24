@@ -66,7 +66,7 @@ def main():
     weeks = read_file(filename)
     race_day = datetime.strptime(race_date_raw, "%Y-%m-%d")
     current_date = race_day
-    today = datetime.today()
+    today = datetime.today().date()
     for w in reversed(weeks):
         for d in reversed(w.days):
             if d != "Rest":
@@ -78,17 +78,26 @@ def main():
 
     print("*** final schedule ***")
     found_today = False
+
     for w in weeks:
         print(f"\nweek num: {w.week_num}")
         for i, d in enumerate(w.training_days):
-            if is_time_based:
-                print(datetime.strftime(d[1], "%a, %B %d, %Y") + ": " + d[0])
-            else:
-                print(datetime.strftime(d[1], "%a, %B %d, %Y") + ": " + "{:2.1f}".format(d[0]) + " km")
+            day = d[1]
+            activity = d[0]
 
-            if not found_today and d[1] >= today:
-                found_today = True
-                print("****** WE ARE AROUND HERE ******")
+            here = ""
+            if not found_today:
+                if today < day.date():
+                    print("****** WE ARE HERE ******")
+                    found_today = True
+                elif today == day.date():
+                    here = " ****** IT IS TODAY ******"
+                    found_today = True
+
+            if is_time_based:
+                print(datetime.strftime(day, "%a, %B %d, %Y") + ": " + activity + here)
+            else:
+                print(datetime.strftime(day, "%a, %B %d, %Y") + ": " + "{:2.1f}".format(activity) + " km" + here)
 
 
 if __name__ == "__main__":
