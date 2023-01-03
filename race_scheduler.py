@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import sys
 
+from event_creator import create_events
+
 
 class Week:
     def __init__(self, week_num, days):
@@ -14,11 +16,12 @@ class Week:
 
 
 class Input:
-    def __init__(self, filename, race_date, is_time_based, create_entries):
+    def __init__(self, filename, race_date, is_time_based, create_entries, tag):
         self.filename = filename
         self.race_date = race_date
         self.is_time_based = is_time_based
         self.create_entries = create_entries
+        self.tag = tag  # tag is used to mark all events created
 
 
 def read_file(filename):
@@ -53,26 +56,27 @@ def format_date(d):
 
 
 def print_usage_and_exit():
-    print("usage: python race_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time> [--create-entries]")
+    print("usage: python race_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time> <tag> [--create-entries]")
     sys.exit()
 
 
 def validate_args(args):
-    if len(args) < 4:
+    if len(args) < 5:
         print("Not enough arguments")
         print_usage_and_exit()
 
     filename = args[1]
     race_date_raw = args[2]
     unit = args[3]
+    tag = args[4]
     create_entries = False
-    if len(args) == 5:
-        if args[4] == "--create-entries":
+    if len(args) == 6:
+        if args[5] == "--create-entries":
             create_entries = True
         else:
             print("Error: unrecognized argument")
             print_usage_and_exit()
-    elif len(args) > 5:
+    elif len(args) > 6:
         print("Too many arguments")
         print_usage_and_exit()
 
@@ -82,7 +86,7 @@ def validate_args(args):
     is_time_based = unit == "time"
     race_day = datetime.strptime(race_date_raw, "%Y-%m-%d")
 
-    return Input(filename, race_day, is_time_based, create_entries)
+    return Input(filename, race_day, is_time_based, create_entries, tag)
 
 
 def main():
@@ -96,7 +100,7 @@ def main():
         for d in reversed(w.days):
             if d.lower() != "rest":
                 if input_args.is_time_based:
-                    w.training_days.insert(0, (d, current_date))
+                    w.training_days.insert(0, (d.lower(), current_date))
                 else:
                     w.training_days.insert(0, (float(d), current_date))
             current_date = current_date - timedelta(days=1)
@@ -123,6 +127,12 @@ def main():
                 print(format_date(day) + ": " + activity + here)
             else:
                 print(format_date(day) + ": " + "{:2.1f}".format(activity) + " km" + here)
+
+    if input_args.create_entries:
+        print("creating entries")
+        create_events(weeks, input_args.tag)
+    else:
+        print("NOT creating entries")
 
 
 if __name__ == "__main__":
