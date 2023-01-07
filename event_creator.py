@@ -36,11 +36,10 @@ def create_events(weeks, tag):
         service = build('calendar', 'v3', credentials=creds)
 
         # Call the Calendar API
-        # now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
         # Refer to the Python quickstart on how to setup the environment:
-# https://developers.google.com/calendar/quickstart/python
-# Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
-# stored credentials.
+        # https://developers.google.com/calendar/quickstart/python
+        # Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
+        # stored credentials.
 
         for week_num, w in enumerate(weeks):
             print(f"\nweek num: {w.week_num}")

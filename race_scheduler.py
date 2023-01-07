@@ -56,26 +56,30 @@ def format_date(d):
 
 
 def print_usage_and_exit():
-    print("usage: python race_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time> <tag> [--create-entries]")
+    print("usage: python race_scheduler.py <schedule.csv> <race_date_in_YYYY-MM-DD> <distance|time> [--create-entries <tag>]")
     sys.exit()
 
 
 def validate_args(args):
-    if len(args) < 5:
+    if len(args) < 4:
         print("Not enough arguments")
         print_usage_and_exit()
 
     filename = args[1]
     race_date_raw = args[2]
     unit = args[3]
-    tag = args[4]
+    tag = ""
     create_entries = False
-    if len(args) == 6:
-        if args[5] == "--create-entries":
+    if len(args) == 5:
+        print("Not enough arguments")
+        print_usage_and_exit()
+    elif len(args) == 6:
+        if args[4] == "--create-entries":
             create_entries = True
         else:
             print("Error: unrecognized argument")
             print_usage_and_exit()
+        tag = args[5]
     elif len(args) > 6:
         print("Too many arguments")
         print_usage_and_exit()
